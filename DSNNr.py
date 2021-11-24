@@ -290,33 +290,23 @@ def get_data(args, getnorm=False):
 
 
 def handle_data(args, MCa, MCb, MCa_weights, MCb_weights, MCa_spec, MCb_spec):
-    # MCa_labels = to_categorical(np.zeros([2, len(MCa[1])]), num_classes=2) 
-    # MCb_labels = to_categorical(np.ones([2, len(MCa[1])]), num_classes=2)
     MCa_labels = to_categorical(np.zeros(MCa.shape[0]), num_classes=2)
     MCb_labels = to_categorical(np.ones(MCb.shape[0]), num_classes=2)
-    print("len MCa[1]:{}".format(len(MCa[1])))
-    print("MCa shape:{}, MCb shape:{}".format(np.array(MCa).shape, np.array(MCb).shape))
-    print("MCa weight shape:{}, MCb shape:{}".format(np.array(MCa_weights).shape, np.array(MCb_weights).shape))
-    #To use np.concatenate, we need to extend the second array to 2D and then concatenate along axis=1.
     X = np.concatenate( (MCa, MCb) )
     Y = np.concatenate( (MCa_labels, MCb_labels) )
     W = np.concatenate( (MCa_weights, MCb_weights) )
     S = np.concatenate( (MCa_spec, MCb_spec) ) 
-    # X = np.concatenate( (MCa, MCb[:]), axis=1)
-    # Y = np.concatenate( (MCa_labels, MCb_labels), axis=1 )
-    # W = np.concatenate( (MCa_weights, MCb_weights), axis=1) 
-    print("X len:{}, Y len:{}, W len:{}".format(len(X), len(Y), len(W)))
-    print("X shape:{}, Y shape:{}, W shape:{}".format(np.array(X).shape, np.array(Y).shape, np.array(W).shape))
+    Y_class = argmax(Y, axis=1)
+    unique_y = [1.,0.] #1 for the MCa, 0 for the MCb
+    unique_classes = np.unique(Y_class)
+    class_weights = dict(zip(unique_y,sklearn.utils.class_weight.compute_class_weight('balanced', unique_classes, Y_class)))
+
     X_train, X_test, Y_train, Y_test, W_train, W_test, S_train, S_test = train_test_split(X, Y, W, S, test_size=0.5, shuffle=True,random_state=1)
 
-    
-    #train_weights = X_train[:, -1]
-    #test_weights = X_test[:, -1]
-    #X_train = X_train[:, 0:n_features]
-    #X_test = X_test[:, 0:n_features]
+    #Store the numpy to disk
     np.savez("DataMCaSplit5050_MCaBB_split", X_train=X_train, X_test=X_test, Y_train=Y_train, Y_test=Y_test, W_train=W_train, W_test=W_test, S_train=S_train, S_test=S_test)
 
-    return X_train, X_test, Y_train, Y_test, W_train, W_test, S_train, S_test
+    return X_train, X_test, Y_train, Y_test, W_train, W_test, S_train, S_test, class_weights
 
 
 def basic_model(args, n_features=1):
@@ -354,14 +344,16 @@ def basic_model(args, n_features=1):
 def DS_model(in_dim):
 
     # network architecture parameters
-    Phi_sizes = (20, 20,15) #(140,140,168)
-    F_sizes = (20,20,20) #(140,140,140)
-    
+    Phi_sizes = (80,80,60) #(140,140,168)
+    F_sizes = (80,80,80) #(140,140,140)
+    ##https://github.com/keras-team/keras/blob/68dc181a5e34d1f20edabe531176b3bfb50001f9/keras/engine/training.py#L382-L383
+    ##metrics: List of metrics to be evaluated by the model during training and testing.
+    ##weighted_metrics: List of metrics to be evaluated and weighted by sample_weight or class_weight during training and testing
     compile_opts={ 'loss':'categorical_crossentropy',
-                   'optimizer':'adam',
-                   'metrics':'acc',
-                   #'optimizer':'adamax',
-                   #'metrics':'categorical_accuracy',
+                   #'optimizer':'adam',
+                   #'metrics':'acc',
+                   'optimizer':'adamax',
+                   'metrics':'categorical_accuracy',
                    'weighted_metrics':["categorical_crossentropy"],
                   }
     print("in_dim:{}".format(in_dim))
@@ -369,7 +361,6 @@ def DS_model(in_dim):
                 Phi_sizes=Phi_sizes, F_sizes=F_sizes,
                 summary=False,
                 mask_val=1.5,
-                #mask_val=-9.90000000e+01,
                 #Phi_acts='softmax',
                 #F_acts='softmax',
                 #dense_dropouts=0.25,

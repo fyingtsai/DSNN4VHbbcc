@@ -144,6 +144,7 @@ def train(args):
         test_weights,
         S_train,
         S_test,
+        class_weights,
     ) = DSNNr.handle_data(args, MCa, MCb, MCa_weights, MCb_weights, MCa_spec, MCb_spec)
     #) = DSNNr.handle_data(args, MCa, MCb, MCa_weights, MCb_weights, MCa_spectors, MCb_spectors)
     #np.savez("CombinedSplitMCade5050_mask15_noLumi", X_train=X_train, X_test=X_test, Y_train=Y_train, Y_test=Y_test, W_train=train_weights, W_test=test_weights, S_train=S_train, S_test=S_test)
@@ -193,6 +194,7 @@ def train(args):
                         epochs = 1000,
                         batch_size = 2000,
                         validation_data = (X_test, Y_test, test_weights),
+                        class_weight=class_weights,
                         sample_weight=train_weights,
                         verbose = 1, 
                         callbacks = callbacks) # Train the model with the new callback
