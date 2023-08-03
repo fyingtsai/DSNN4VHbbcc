@@ -14,9 +14,17 @@ import numpy as np
 import pandas as pd
 import awkward as ak
 # energyflow imports
-import energyflow as ef
-from energyflow.archs import PFN
-from energyflow.utils import data_split, remap_pids, to_categorical
+#import energyflow as ef
+#from energyflow.archs import PFN
+#from energyflow.utils import data_split, remap_pids, to_categorical
+# Residual Training
+from pathlib import Path
+import sys
+path_root = Path(__file__).parents[2]
+sys.path.append(str(path_root))
+print(sys.path)
+from EnergyFlow.energyflow.archs import PFN
+from EnergyFlow.energyflow.utils import data_split, remap_pids, to_categorical
 
 from operator import itemgetter
 import matplotlib.pyplot as plt
@@ -68,7 +76,7 @@ def handle_args():
     parser.add_argument("--nEvents", type=int, default=100000)
     parser.add_argument("--VerbosePlot", type=int, default=-1)
     parser.add_argument("--dropout", type=float, default=-99.0)
-
+    parser.add_argument("--isTraining", type=bool, default=False)
     args = parser.parse_args()
 
     return args
@@ -184,8 +192,8 @@ def preprocess_data(
     print("    Length total: \n {}".format(len(MCb_total[:,0,0])))
     print("    Length weightsb total : \n {}".format(len(MCb_weights_total)))
                 
-
-    MCa_total, MCb_total = PreScaleInputRange(MCa_total, MCb_total, features, "linear")
+    ## Doing PreScaleInputRange only after data preporcessing for 3 MCs compaign is ready.
+    #MCa_total, MCb_total = PreScaleInputRange(MCa_total, MCb_total, features, "linear")
    
     # return (MCa_total, MCb_total, MCa_weights_total, MCb_weights_total, maxObjs)
 
@@ -304,7 +312,7 @@ def handle_data(args, MCa, MCb, MCa_weights, MCb_weights, MCa_spec, MCb_spec):
     X_train, X_test, Y_train, Y_test, W_train, W_test, S_train, S_test = train_test_split(X, Y, W, S, test_size=0.5, shuffle=True,random_state=1)
 
     #Store the numpy to disk
-    np.savez("DataMCaSplit5050_MCaBB_split", X_train=X_train, X_test=X_test, Y_train=Y_train, Y_test=Y_test, W_train=W_train, W_test=W_test, S_train=S_train, S_test=S_test)
+    np.savez("DataMCaSplit5050_split", X_train=X_train, X_test=X_test, Y_train=Y_train, Y_test=Y_test, W_train=W_train, W_test=W_test, S_train=S_train, S_test=S_test)
 
     return X_train, X_test, Y_train, Y_test, W_train, W_test, S_train, S_test, class_weights
 
@@ -350,9 +358,9 @@ def DS_model(in_dim):
     ##metrics: List of metrics to be evaluated by the model during training and testing.
     ##weighted_metrics: List of metrics to be evaluated and weighted by sample_weight or class_weight during training and testing
     compile_opts={ 'loss':'categorical_crossentropy',
-                   #'optimizer':'adam',
+                   'optimizer':'adam',
                    #'metrics':'acc',
-                   'optimizer':'adamax',
+                   #'optimizer':'adamax',
                    'metrics':'categorical_accuracy',
                    'weighted_metrics':["categorical_crossentropy"],
                   }
@@ -360,12 +368,12 @@ def DS_model(in_dim):
     DSNNr = PFN(input_dim=in_dim, 
                 Phi_sizes=Phi_sizes, F_sizes=F_sizes,
                 summary=False,
-                mask_val=1.5,
+                mask_val=-99,
                 #Phi_acts='softmax',
                 #F_acts='softmax',
                 #dense_dropouts=0.25,
-                latent_dropout=0.2,
-                F_dropouts=0.3,
+                #latent_dropout=0.2,
+                #F_dropouts=0.3,
                 compile_opts=compile_opts)
 
     return DSNNr
@@ -394,10 +402,10 @@ def PadFeatures(MCa, MCb, features, nObjsPerFeature):
     # n_tau_4vector = np.array(["n_tau_pt", "n_tau_eta", "n_tau_phi", "n_tau_m"])
     # p_tau_4vector = np.array(["p_tau_pt", "p_tau_eta", "p_tau_phi", "p_tau_m"])
 
-    B1_4vector = np.array(["pTB1","etaB1","phiB1", "mB1","pdgIDB1"])
-    B2_4vector = np.array(["pTB2", "etaB2", "phiB1", "mB1", "pdgIDB2"])
+    B1_4vector = np.array(["pTB1","etaB1","phiB1", "mB1","FlavB1"])
+    B2_4vector = np.array(["pTB2", "etaB2", "phiB1", "mB1", "FlavB2"])
     # pfjet_4vector = np.array(["pfjet_pt","pfjet_eta","pfjet_phi","pfjet_m"])
-    thirdjet_4vector = np.array(["pTJ3","etaJ3","phiJ3","mJ3", "pdgIDJ3"]) #the third jets
+    thirdjet_4vector = np.array(["pTJ3","etaJ3","phiJ3","mJ3", "FlavJ3"]) #the third jets
     met_4vector = np.array(["met_met", "met_eta", "met_phi", "met_m", "met_pdgid"])
 
     # obj_pt  = np.array(["el_pt", "mu_pt"])
@@ -442,8 +450,10 @@ def PadFeatures(MCa, MCb, features, nObjsPerFeature):
 
     met_MCa_events = zip(*a_met)
     met_MCb_events = zip(*b_met)
+
     MCa_Events = list(zip(ele_MCa_events, mu_MCa_events, B1_MCa_events, B2_MCa_events, thirdjet_MCa_events, met_MCa_events))
     MCb_Events = list(zip(ele_MCb_events, mu_MCb_events, B1_MCb_events, B2_MCb_events, thirdjet_MCb_events, met_MCb_events))
+
     print("Event MCa shape:{}".format(np.array(list(MCa_Events)).shape))
     print("Event MCb shape:{}".format(np.array(list(MCb_Events)).shape))
     print("MCa:{}".format(np.array(list(MCb_Events))))
@@ -869,8 +879,17 @@ def  PreScaleInputRange(MCa, MCb, features, type="linear"):
             print("PreScaleInputs: MCa   {}, size:{}".format(MCa[:,:,index], len(MCa)))
             print("PreScaleInputs: MCb   {}, size:{}".format(MCb[:,:,index], len(MCb)))
 
-    MCa = np.nan_to_num(MCa, nan=1.5)
-    MCb = np.nan_to_num(MCb, nan=1.5)
+    MCa = np.nan_to_num(MCa, nan=-99)
+    MCb = np.nan_to_num(MCb, nan=-99)
+
+    #Featrue Scaling: jet IDs
+    arrays = [MCa, MCb]
+    indices = [2, 3, 4]  # Indices of the arrays to transform: leading, sub-leading, and the third jets.
+    # PDGIDs for b is 4, for c is 5 and for light quark is 0.
+    column = 4  # ID column to transform within the selected indices
+    for array in arrays:
+       for index in indices:
+          array[:, index, column] = [np.nan if value == -99 else value * 0.1 for value in array[:, index, column]]
     return MCa,MCb
 
 

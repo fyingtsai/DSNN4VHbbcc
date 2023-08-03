@@ -12,5 +12,5 @@ cd /hpcgpfs01/scratch/ftsai/DSNNr4gpu
 conda create --prefix ./tf2-cpu tensorflow matplotlib tensorboard
 conda activate /hpcgpfs01/scratch/ftsai/DSNNr4gpu/tf2-cpu
 #source myVirtualEnv/bin/activate
-
-srun ./myDSNNr_runPlots.sh
+srun python makingSpecPlots.py
+#srun ./myDSNNr_runPlots.sh
