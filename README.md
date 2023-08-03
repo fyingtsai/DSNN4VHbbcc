@@ -7,6 +7,18 @@ We learn to implement ["Energy Flow Networks"](https://arxiv.org/abs/1810.05165)
 + Test the application running in the various computing environment (HTCondor, SLURM, GCP, HPC...). The project is also built off of an interactive way of running code in Jupyter Notebook.
 + Speed up the data preprocessing and the NN training using DASK, Ray... etc.
 
+**Demo**
+We've prepared a demonstration of the DSNN application in a Google Colab notebook. This demo will walk you through the steps of using the DSNN framework for shape systematic uncertainty estimation.
+Click [here](https://colab.research.google.com/drive/1YVBuYGpHAc74POLuiqjyiSxwTI6jdZv9#scrollTo=i1vlXcasy1KT) to access the DSNN demo in Google Colab.
+
+In this demo, you'll be able to:
+
+- Explore the data preprocessing steps
+- Configure and train the DSNN model
+- Visualize the training results
+- Apply the trained model to make predictions
+- Plot the results using the provided plotting code
+
 **Data Preprocessing**:
 
 For the smaller dataset:
@@ -18,8 +30,10 @@ The PreScaleInputRange step is performed after data preprocessing, especially to
 2. Summation and Data Feature Scaling: Once the three independent MC campaigns are complete, you can proceed to aggregate the results. This involves summing up the data arrays obtained from each campaign. Following this, the step of feature scaling is performed. To do this, using the command `sbatch myscript_feat.sh`. <br />
 3. Training inputs preparation: The output of the above step will yield two vital files, namely `SherpaOutputs.npz` and `MGPy8Outputs.npz`. These files serve as essential inputs for training the Deep Set Neural Network (DSNN). <br />
 -The split data will be saved as `DataMCaSplit5050_split.npz`. With the split data ready, you can proceed to generate plots later. <br /> 
+
 **Training**
-4. DSNN training: With the properly scaled and centered training inputs, you can now embark on training the DSNN using these dataset. Then execute: `sbatch myscript.sh` with `--isTraining True` in the `myDSNNr_run.sh` <br />
+
+DSNN training: With the properly scaled and centered training inputs, you can now embark on training the DSNN using these dataset. Then execute: `sbatch myscript.sh` with `--isTraining True` in the `myDSNNr_run.sh` <br />
 ##Note: the residual training using EnergyFlow
 The EnergyFlow library is downloaded and imported in the DSNNr.py. The file `EnergyFlow/energyflow/archs/efn.py` in the project directory contains the implementation details of the deep-set neural network architecture. <br/>
 The `_construct_F` is updated for the 7 layers and connections of the neural networks using the Add() layer from Keras. You will need to experiment the number of residaul connections, layer configurations to find the optimal setup for your specific analysis. <br/>
