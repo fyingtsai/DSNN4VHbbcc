@@ -54,7 +54,7 @@ Replace PATHtoSplitFile with the file path to the split data file generated in t
 3. Define Observables (Spectators) in the makingSpecPlots.py: <br/>
 Modify the obs list to include the observables (spectators) you would like to plot. For example, obs = ["mBB", "pTV", "dRBB", "nJ", "dEtaBB"] can be adjusted to suit your analysis goals.
 4. HistogramCalibrator Implementation:<br/>
-Note that a 2-step calibration using the HistogramCalibrator is applied within the makingSpecPlots.py script. This step involves creating a calibration instance with the predictions from both the signal and background components in the makingSpecPlots.py:
+Note that a 2-step calibration using the HistogramCalibrator is applied within the makingSpecPlots.py script. This step involves creating a calibration instance with the predictions from both the Sherpa and Madgraph components in the makingSpecPlots.py:
 calibrator = HistogramCalibrator(preds_train[:, 0], preds_train_b[:, 0])<br/>
 You will need to experiment the various probabilities and calibrated regions for your specific analysis.
 6. Run the plotting code using `python makingSpecPlots.py`. Submmit the job through: `sbatch plot_Script.sh` <br/>
