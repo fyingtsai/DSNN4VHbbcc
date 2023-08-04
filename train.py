@@ -24,12 +24,11 @@ def train(args):
     with open("config.txt", "w") as f:
         f.write(str(args))
         f.close()
-    isTraining = args.isTraining
     args.MCa_path = args.MCa
     args.MCb_path = args.MCb
-    if not isTraining:
+    if not args.isTraining:
        (MCa, MCb, MCa_spec, MCb_spec, MCa_weights, MCb_weights, maxObjCount)  = DSNNr.get_data(args)
-    if isTraining:
+    if args.isTraining:
        inputOriaFile = "SherpaMCa.hadd.npz"
        inputOribFile = "MadgaphMCa.hadd.npz"
        MCa = np.load(inputOriaFile)["MCa"]

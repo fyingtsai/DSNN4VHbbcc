@@ -26,7 +26,9 @@ Run the application including preprocessing and training data: `sbatch myscript.
 
 ##Note: Data Preprocessing and Campaign Separation: 
 The PreScaleInputRange step is performed after data preprocessing, especially to ensure that the input data ranges are appropriately scaled and centered. However running three MC campaings can be CPU-intensive (>250GB) due to the substantial payload involved. Therefore, it is recommended to execute each MC campaign independently. <br />
-1. For each campaign, ensure that the necessary adjustments are made by replacing `--MCa` and `--MCb` flags in the `myDSNNr_run.sh` script. Then run the application through: `sbatch myscript.sh` with `--isTraining False` in the `myDSNNr_run.sh` <br />
+1. For each campaign, ensure that the necessary adjustments are made by replacing `--MCa` and `--MCb` flags in the `myDSNNr_run.sh` script. Then run the application through: `sbatch myscript.sh` <br />
+- Note: The --isTraining flag is a command-line option that can be used when running the train.py script. It is used to indicate whether the script should operate in training mode or not. When the --isTraining flag is provided without a value, it sets the args.isTraining attribute to True, and when it is omitted, the attribute is set to False.<br/>
+
 2. Summation and Data Feature Scaling: Once the three independent MC campaigns are complete, you can proceed to aggregate the results. This involves summing up the data arrays obtained from each campaign. Following this, the step of feature scaling is performed. To do this, using the command `sbatch myscript_feat.sh`. <br />
 3. Training inputs preparation: The output of the above step will yield two vital files, namely `SherpaOutputs.npz` and `MGPy8Outputs.npz`. These files serve as essential inputs for training the Deep Set Neural Network (DSNN). <br />
 -The split data will be saved as `DataMCaSplit5050_split.npz`. With the split data ready, you can proceed to generate plots later. <br /> 

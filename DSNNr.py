@@ -76,7 +76,7 @@ def handle_args():
     parser.add_argument("--nEvents", type=int, default=100000)
     parser.add_argument("--VerbosePlot", type=int, default=-1)
     parser.add_argument("--dropout", type=float, default=-99.0)
-    parser.add_argument("--isTraining", type=bool, default=False)
+    parser.add_argument("--isTraining", action="store_true", help="Flag indicating training mode")
     args = parser.parse_args()
 
     return args
