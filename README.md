@@ -35,7 +35,7 @@ The PreScaleInputRange step is performed after data preprocessing, especially to
 
 **Training**
 
-DSNN training: With the properly scaled and centered training inputs, you can now embark on training the DSNN using these dataset. Then execute: `sbatch myscript.sh` with `--isTraining True` in the `myDSNNr_run.sh` <br />
+DSNN training: With the properly scaled and centered training inputs, you can now embark on training the DSNN using these dataset. Then execute: `sbatch myscript.sh` with `--isTraining` in the `myDSNNr_run.sh` <br />
 ##Note: the residual training using EnergyFlow
 The EnergyFlow library is downloaded and imported in the DSNNr.py. The file `EnergyFlow/energyflow/archs/efn.py` in the project directory contains the implementation details of the deep-set neural network architecture. <br/>
 The `_construct_F` is updated for the 7 layers and connections of the neural networks using the Add() layer from Keras. You will need to experiment the number of residaul connections, layer configurations to find the optimal setup for your specific analysis. <br/>
