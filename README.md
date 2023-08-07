@@ -5,9 +5,18 @@ We learn to implement ["Energy Flow Networks"](https://arxiv.org/abs/1810.05165)
 **Project Objectives**:
 + Develop a generalized classification for the VH(bb/cc) analysis through Deep Set neural networks.
 + Test the application running in the various computing environment (HTCondor, SLURM, GCP, HPC...). The project is also built off of an interactive way of running code in Jupyter Notebook.
-+ Speed up the data preprocessing and the NN training using DASK, Ray... etc.
++ Speed up the data preprocessing and the NN training using DASK, Ray... etc.<br/>
 
-**Demo**
+
+**Creating and Activating the Conda Environment**:<br/>
+To set up the required conda environment using the provided `environment.yml` file, run the following command to create the conda environment with a custom installation path:<br/>
+`conda env create -f environment.yml --prefix /path/to/your/scratch/tf2-gpu-yml`<br/>
+This command will create the `tf2-gpu-yml` environment in the specified directory. <br/>
+Once the environment is created, you can activate it by running:<br/>
+`conda activate /path/to/your/scratch/tf2-gpu-yml`<br/>
+##Note:In some cases, you might need to update specific packages to versions compatible with your system.<br/>
+
+**Demo**<br/>
 We've prepared a demonstration of the DSNN application in a Google Colab notebook. This demo will walk you through the steps of using the DSNN framework for shape systematic uncertainty estimation.
 Click [here](https://colab.research.google.com/drive/1YVBuYGpHAc74POLuiqjyiSxwTI6jdZv9#scrollTo=i1vlXcasy1KT) to access the DSNN demo in Google Colab.
 
