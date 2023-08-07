@@ -12,10 +12,7 @@ import math
 import time
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-from matplotlib import rc
 from cycler import cycler
-rc("text", usetex=False)
-print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 def train(args):
     if not os.path.isdir(args.global_name):
         os.makedirs(args.global_name)
@@ -58,7 +55,7 @@ def train(args):
                                     monitor='val_loss',
                                     verbose=2,
                                     save_freq='epoch',
-                                    save_best_only=False,
+                                    save_best_only=True,
                                     save_weights_only=False,
                                     mode='min')
        csvLogger = CSVLogger("trainingCSV.csv", separator=",", append=False)
