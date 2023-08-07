@@ -6,13 +6,14 @@ from tensorflow.keras.layers import Input, Dense, Dropout
 from tensorflow.keras.models import Model
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.optimizers import Adam
-
+import sklearn
 from sklearn.model_selection import train_test_split
 from scipy.stats import entropy, chisquare, wasserstein_distance
 
 import numpy as np
 import pandas as pd
 import awkward as ak
+from numpy import argmax
 # energyflow imports
 #import energyflow as ef
 #from energyflow.archs import PFN
@@ -352,7 +353,7 @@ def basic_model(args, n_features=1):
 def DS_model(in_dim):
 
     # network architecture parameters
-    Phi_sizes = (80,80,60) #(140,140,168)
+    Phi_sizes = (100,98,95) #(140,140,168)
     F_sizes = (80,80,80) #(140,140,140)
     ##https://github.com/keras-team/keras/blob/68dc181a5e34d1f20edabe531176b3bfb50001f9/keras/engine/training.py#L382-L383
     ##metrics: List of metrics to be evaluated by the model during training and testing.
